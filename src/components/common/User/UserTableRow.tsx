@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../hooks/index';
-import { makeSelectUserById ,deleteUser} from '../../../stores/slices/user.slice';
+import { makeSelectUserById, deleteUser } from '../../../stores/slices/user.slice';
 import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { User } from '../../../types/user.type';
 import { ButtonCommon } from '../Button';
@@ -18,10 +18,12 @@ const UserTableRow: React.FC<UserTableRowProps> = ({ userId }) => {
   const onEdit = useCallback(() => {
     setIsModalOpen(true);
   }, []);
-  const onDelete = useCallback((userId: number) => {
-    dispatch(deleteUser(userId));
-   
-  }, [dispatch]);
+  const onDelete = useCallback(
+    (userId: number) => {
+      dispatch(deleteUser(userId));
+    },
+    [dispatch],
+  );
   const onView = useCallback((userId: number) => {
     console.log('View user with ID:', userId);
   }, []);
@@ -43,7 +45,9 @@ const UserTableRow: React.FC<UserTableRowProps> = ({ userId }) => {
             {user.role}
           </span>
         </td>
+
         <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>{user.gender}</td>
+        <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>{user.address || ''}</td>
         <td className='px-6 py-4 whitespace-nowrap'>
           <span
             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 

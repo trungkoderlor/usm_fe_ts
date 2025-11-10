@@ -112,7 +112,7 @@ export const selectUserEntities = (state: RootState) => state.user.entities.byId
 export const selectUserIds = (state: RootState) => state.user.entities.allIds;
 ;
 export const selectUserLoading = (state: RootState) => state.user.loading;
-
+export const selectAllUsers = (state: RootState) => Object.values(state.user.entities.byId);
 export const selectUserById = (state: RootState, userId: number) => state.user.entities.byId[userId];
 export const selectUserList = (state: RootState) =>
   state.user.entities.allIds.map(id => state.user.entities.byId[id]);
