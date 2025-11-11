@@ -5,9 +5,9 @@ const input = tv({
   base: 'w-full p-2 border border-gray-300 bg-white cursor-pointer rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500',
   variants: {
     size: {
-      sm: 'text-sm',
-      md: 'text-base',
-      lg: 'text-lg',
+      sm: 'text-sm h-8',
+      md: 'text-base h-10',
+      lg: 'text-lg h-12',
     },
     border: {
       none: 'border-none',
@@ -54,11 +54,11 @@ export const InputCommon: React.FC<InputProps> = ({
           {label}
         </label>
       )}
-      <div className={`flex items-center gap-2 ${input({ border, size })} ${backgroundColor}`}>
+      <div className={`flex items-center gap-2 `}>
         {icon && <span className='text-gray-500'>{icon}</span>}
         <input
           id={inputId}
-          className='outline-none h-full bg-transparent flex-1'
+          className={`outline-none h-full bg-transparent flex-1 ${input({ border, size })} ${backgroundColor}`}
           disabled={loading || isDisabled}
           {...rest}
         />

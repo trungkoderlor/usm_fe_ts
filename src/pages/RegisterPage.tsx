@@ -2,54 +2,84 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ButtonCommon } from '../components/common/Button';
 import { InputCommon } from '../components/common/Input';
+import { useAppDispatch } from '../hooks';
+import { register } from '../stores/slices/auth.slice';
 import { useAuth } from '../hooks/useAuth';
 
-interface LoginProps {}
+interface RegisterProps {}
 
-const Login: React.FC<LoginProps> = () => {
+const Register: React.FC<RegisterProps> = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fullname, setFullname] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { loginUser, isAuthenticated } = useAuth();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
-    setError(''); // Clear error when user types
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
-    setError(''); // Clear error when user types
+  };
+
+  const handleFullnameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFullname(e.target.value);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
 
-    if (!email || !password) {
+    if (!email || !password || !fullname) {
       setError('Vui lòng điền đầy đủ thông tin');
       return;
     }
 
     try {
       setLoading(true);
-      await loginUser({ email, password }).unwrap();
+      await dispatch(
+        register({
+          email,
+          password,
+          fullname,
+        }),
+      ).unwrap();
+
+      // Redirect to home or dashboard after successful registration
       navigate('/');
     } catch (err: any) {
-      setError(err || 'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.');
+      setError(err || 'Đăng ký thất bại');
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
+
   return (
     <div className='flex items-center justify-center min-h-[calc(100vh-92px)]'>
       <div className='w-1/3 p-4 bg-white border border-gray-300 rounded-lg shadow-md'>
-        <h2 className='text-3xl text-center font-semibold mb-4'>Đăng nhập</h2>
+        <h2 className='text-3xl text-center font-semibold mb-4'>Đăng ký</h2>
         <form className='w-full mx-auto border border-gray-300 rounded-lg p-4 bg-gray-50' onSubmit={handleSubmit}>
           {error && <div className='mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded'>{error}</div>}
+
+          <InputCommon
+            type='text'
+            value={fullname}
+            label='Họ tên'
+            placeholder='Nhập họ tên của bạn'
+            onChange={handleFullnameChange}
+            required
+            disabled={loading}
+          />
 
           <InputCommon
             type='email'
@@ -73,15 +103,15 @@ const Login: React.FC<LoginProps> = () => {
 
           <div className='mb-4'>
             <ButtonCommon color='primary' className='w-full' type='submit' disabled={loading}>
-              {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+              {loading ? 'Đang đăng ký...' : 'Đăng ký'}
             </ButtonCommon>
           </div>
         </form>
 
         <div className='text-center mt-4 flex items-center justify-center p-4'>
-          <span className='text-gray-600'>Chưa có tài khoản?</span>
-          <Link to='/auth/register' className='text-blue-500 hover:text-blue-700 underline ml-1'>
-            Đăng ký
+          <span className='text-gray-600'>Đã có tài khoản?</span>
+          <Link to='/auth/login' className='text-blue-500 hover:text-blue-700 underline ml-1'>
+            Đăng nhập
           </Link>
         </div>
       </div>
@@ -89,4 +119,4 @@ const Login: React.FC<LoginProps> = () => {
   );
 };
 
-export default Login;
+export default Register;

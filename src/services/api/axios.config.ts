@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getToken } from './token.service';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:3001',
+  baseURL: import.meta.env.VITE_BASE_URL || 'http://localhost:3001',
   headers: {
     'Content-Type': 'application/json'
   }
@@ -20,13 +20,14 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     // Xử lý lỗi 401 Unauthorized
     if (error.response && error.response.status === 401) {
       // Xử lý logout nếu token hết hạn
+      localStorage.removeItem('token');
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

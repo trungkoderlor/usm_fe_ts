@@ -25,7 +25,6 @@ export const fetchUsers = createAsyncThunk(
     }
   }
 );
-
 export const updateUser = createAsyncThunk(
   'users/update',
   async (userData: User, { rejectWithValue }) => {
@@ -36,11 +35,22 @@ export const updateUser = createAsyncThunk(
     }
   }
 );
+export const createUser = createAsyncThunk(
+  'users/create',
+  async (userData: Partial<User>, { rejectWithValue }) => {
+    try {
+      return await userService.createUser(userData);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || 'Failed to create user');
+    }
+  }
+);
 export const deleteUser = createAsyncThunk(
   'users/delete',
   async (userId: number, { rejectWithValue }) => {
     try {
-      return await userService.deleteUser(userId);
+      await userService.deleteUser(userId);
+      return userId;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || 'Failed to delete user');
     }
@@ -88,8 +98,22 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
+      .addCase(createUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(createUser.fulfilled, (state, action: PayloadAction<User>) => {
+        state.loading = false;
+        state.entities.byId[action.payload.id] = action.payload;
+        state.entities.allIds.push(action.payload.id);
+      })
+      .addCase(createUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
       .addCase(deleteUser.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(deleteUser.fulfilled, (state, action: PayloadAction<number>) => {
         state.loading = false;

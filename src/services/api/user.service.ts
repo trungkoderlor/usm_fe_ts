@@ -10,6 +10,10 @@ export const userService = {
     const response = await axiosInstance.get<User>(`/users/${id}`);
     return response.data;
   },
+  createUser: async (userData: Partial<User>) => {
+    const response = await axiosInstance.post<User>('/users/create', userData);
+    return response.data;
+  },
   updateUser: async (id: number, userData: Partial<User>) => {
     const response = await axiosInstance.patch<User>(`/users/${id}`, userData);
     return response.data;

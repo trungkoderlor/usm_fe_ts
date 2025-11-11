@@ -5,6 +5,7 @@ import RootLayout from '../layouts/RootLayout';
 const LoginPage = lazy(() => import('../pages/LoginPage'));
 const ListUser = lazy(() => import('../pages/ListUser'));
 const ProfilePage = lazy(() => import('../pages/ProfilePage'));
+const RegisterPage = lazy(() => import('../pages/RegisterPage'));
 export const routes: RouteObject[] = [
   {
     path: '/',
@@ -30,6 +31,15 @@ export const routes: RouteObject[] = [
           {
             path: 'login',
             element: <LoginPage />,
+          },
+        ],
+      },
+      {
+        path: 'auth',
+        children: [
+          {
+            path: 'register',
+            element: <RegisterPage />,
           },
         ],
       },

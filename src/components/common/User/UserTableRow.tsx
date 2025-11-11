@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../hooks/index';
 import { makeSelectUserById, deleteUser } from '../../../stores/slices/user.slice';
-import { EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { User } from '../../../types/user.type';
 import { ButtonCommon } from '../Button';
 import EditUserModal from '../Modal/EditUserModal';
@@ -58,9 +58,9 @@ const UserTableRow: React.FC<UserTableRowProps> = ({ userId }) => {
         </td>
         <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
           <div className='flex space-x-2'>
-            <ButtonCommon size='sm' color='primary' onClick={() => onView(userId)} icon={<EyeOutlined />}>
+            {/* <ButtonCommon size='sm' color='primary' onClick={() => onView(userId)} icon={<EyeOutlined />}>
               View
-            </ButtonCommon>
+            </ButtonCommon> */}
 
             <ButtonCommon size='sm' color='secondary' onClick={() => onEdit()} icon={<EditOutlined />}>
               Edit

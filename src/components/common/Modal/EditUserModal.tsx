@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../hooks';
-import { selectUserById, updateUser, selectUserLoading } from '../../../stores/slices/user.slice';
+import { selectUserById, updateUser, createUser } from '../../../stores/slices/user.slice';
 import { User } from '../../../types/user.type';
-import { InputCommon } from '../Input';
 import { ButtonCommon } from '../Button';
 
 interface EditUserModalProps {
@@ -12,12 +11,22 @@ interface EditUserModalProps {
 }
 
 const EditUserModal: React.FC<EditUserModalProps> = ({ userId, isOpen, onClose }) => {
-  const [formData, setFormData] = useState<Partial<User>>({});
+  const [formData, setFormData] = useState<Partial<User>>({
+    fullname: '',
+    email: '',
+    password: '',
+    role: 'user',
+    gender: 'male',
+    status: 'active',
+  });
   const modalRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => {
     return userId ? selectUserById(state, userId) : null;
   });
+
+  const isEditMode = userId !== null;
+
   // Initialize form data when user changes
   useEffect(() => {
     if (user) {
@@ -29,8 +38,18 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ userId, isOpen, onClose }
         gender: user.gender,
         status: user.status,
       });
+    } else {
+      // Reset form for create mode
+      setFormData({
+        fullname: '',
+        email: '',
+        password: '',
+        role: 'user',
+        gender: 'male',
+        status: 'active',
+      });
     }
-  }, [user]);
+  }, [user, isOpen]);
 
   // Handle click outside to close
   useEffect(() => {
@@ -76,10 +95,16 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ userId, isOpen, onClose }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (user && formData) {
+
+    if (isEditMode && user) {
+      // Update existing user
       dispatch(updateUser({ ...user, ...formData }));
-      onClose();
+    } else {
+      // Create new user
+      dispatch(createUser(formData));
     }
+
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -88,36 +113,60 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ userId, isOpen, onClose }
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
       <div ref={modalRef} className='bg-white rounded-lg shadow-xl w-full max-w-md p-6 mx-4'>
         <div className='flex justify-between items-center mb-4'>
-          <h2 className='text-xl font-bold'>Chỉnh sửa thông tin người dùng</h2>
-          <button onClick={onClose} className='text-gray-500 hover:text-gray-700'>
+          <h2 className='text-xl font-bold'>{isEditMode ? 'Chỉnh sửa thông tin người dùng' : 'Thêm người dùng mới'}</h2>
+          <button onClick={onClose} className='text-gray-500 hover:text-gray-700 text-2xl'>
             &times;
           </button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <InputCommon
-            label='Họ tên'
-            name='fullname'
-            value={formData.fullname || ''}
-            onChange={handleChange}
-            className='mb-4'
-          />
+          <div className='mb-4'>
+            <label className='block text-gray-700 font-semibold mb-2'>Họ tên</label>
+            <input
+              type='text'
+              name='fullname'
+              value={formData.fullname || ''}
+              onChange={handleChange}
+              required
+              className='w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            />
+          </div>
 
-          <InputCommon
-            label='Email'
-            name='email'
-            type='email'
-            value={formData.email || ''}
-            onChange={handleChange}
-            disabled
-            className='mb-4'
-          />
+          <div className='mb-4'>
+            <label className='block text-gray-700 font-semibold mb-2'>Email</label>
+            <input
+              type='email'
+              name='email'
+              value={formData.email || ''}
+              onChange={handleChange}
+              disabled={isEditMode}
+              required
+              className={
+                'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ' +
+                (isEditMode ? 'bg-gray-100 cursor-not-allowed' : '')
+              }
+            />
+          </div>
+
+          {!isEditMode && (
+            <div className='mb-4'>
+              <label className='block text-gray-700 font-semibold mb-2'>Mật khẩu</label>
+              <input
+                type='password'
+                name='password'
+                value={formData.password || ''}
+                onChange={handleChange}
+                required
+                className='w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              />
+            </div>
+          )}
 
           <div className='mb-4'>
             <label className='block text-gray-700 font-semibold mb-2'>Vai trò</label>
             <select
               name='role'
-              value={formData.role || ''}
+              value={formData.role || 'user'}
               onChange={handleChange}
               className='w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
             >
@@ -130,7 +179,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ userId, isOpen, onClose }
             <label className='block text-gray-700 font-semibold mb-2'>Giới tính</label>
             <select
               name='gender'
-              value={formData.gender || ''}
+              value={formData.gender || 'male'}
               onChange={handleChange}
               className='w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
             >
@@ -144,7 +193,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ userId, isOpen, onClose }
             <label className='block text-gray-700 font-semibold mb-2'>Trạng thái</label>
             <select
               name='status'
-              value={formData.status || ''}
+              value={formData.status || 'active'}
               onChange={handleChange}
               className='w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
             >
@@ -158,7 +207,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ userId, isOpen, onClose }
               Hủy
             </ButtonCommon>
             <ButtonCommon type='submit' color='primary'>
-              Lưu thay đổi
+              {isEditMode ? 'Lưu thay đổi' : 'Tạo mới'}
             </ButtonCommon>
           </div>
         </form>

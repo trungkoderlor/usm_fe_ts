@@ -27,7 +27,18 @@ export const login = createAsyncThunk(
     }
   }
 );
-
+export const register = createAsyncThunk(
+  'auth/register',
+  async (userData: { email: string; password: string; fullname: string }, { rejectWithValue }) => {
+    try {
+      const { access_token: token } = await authService.register(userData);
+      setToken(token);
+      return token;
+    } catch (error: any) {
+      return rejectWithValue(error?.response?.data?.message || 'Register failed');
+    }
+  }
+);
 
 export const fetchCurrentUser = createAsyncThunk(
   'auth/fetchCurrentUser',
@@ -82,7 +93,21 @@ const authSlice = createSlice({
         state.token = null;
         state.isAuthenticated = false;
         removeToken();
+      })
+      .addCase(register.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(register.fulfilled, (state, action: PayloadAction<string>) => {
+        state.token = action.payload;
+        state.isAuthenticated = true;
+        state.loading = false;
+      })
+      .addCase(register.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
+
   },
 });
 

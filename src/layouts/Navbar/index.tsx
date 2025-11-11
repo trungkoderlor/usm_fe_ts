@@ -12,8 +12,11 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
   }, [isAuthenticated, user, getCurrentUser]);
   const navigate = useNavigate();
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !user) {
       navigate('/auth/login');
+    }
+    if (isAuthenticated && user) {
+      navigate('/');
     }
   }, [isAuthenticated, navigate]);
   return (
