@@ -27,7 +27,7 @@ axiosInstance.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       // Xử lý logout nếu token hết hạn
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      window.location.href = '/auth/login';
     }
     return Promise.reject(error);
   }
