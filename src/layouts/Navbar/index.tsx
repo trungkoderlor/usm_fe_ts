@@ -1,4 +1,4 @@
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useEffect } from 'react';
 
@@ -10,15 +10,15 @@ const NavBar: React.FC<NavBarProps> = ({}) => {
       getCurrentUser();
     }
   }, [isAuthenticated, user, getCurrentUser]);
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (!isAuthenticated && !user) {
-      navigate('/auth/login');
-    }
-    if (isAuthenticated && user) {
-      navigate('/');
-    }
-  }, [isAuthenticated, navigate]);
+  // const navigate = useNavigate();
+  // useEffect(() => {
+  //   if (!isAuthenticated && !user) {
+  //     navigate('/auth/login');
+  //   }
+  //   if (isAuthenticated && user) {
+  //     navigate('/');
+  //   }
+  // }, [isAuthenticated, navigate]);
   return (
     <nav className='bg-black text-white p-4 '>
       <div className='container mx-auto flex justify-between items-center'>
